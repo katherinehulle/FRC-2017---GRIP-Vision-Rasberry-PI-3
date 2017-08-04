@@ -12,8 +12,8 @@ class GripPipeline:
         """initializes all values to presets or None if need to be set
         """
 
-        self.__resize_image_width = 640.0
-        self.__resize_image_height = 480.0
+        self.__resize_image_width = 480.0
+        self.__resize_image_height = 360.0
         self.__resize_image_interpolation = cv2.INTER_CUBIC
 
         self.resize_image_output = None
@@ -67,6 +67,13 @@ class GripPipeline:
         (self.filter_contours_output) = self.__filter_contours(self.__filter_contours_contours, self.__filter_contours_min_area, self.__filter_contours_min_perimeter, self.__filter_contours_min_width, self.__filter_contours_max_width, self.__filter_contours_min_height, self.__filter_contours_max_height, self.__filter_contours_solidity, self.__filter_contours_max_vertices, self.__filter_contours_min_vertices, self.__filter_contours_min_ratio, self.__filter_contours_max_ratio)
 
 
+     def set_source0(self, value):
+        """Sets source0 to given value checking for correct type.
+        """
+        assert isinstance(value, numpy.ndarray) , "Source must be of type numpy.ndarray"
+        self.__source0 = value
+
+        
     @staticmethod
     def __resize_image(input, width, height, interpolation):
         """Scales and image to an exact size.

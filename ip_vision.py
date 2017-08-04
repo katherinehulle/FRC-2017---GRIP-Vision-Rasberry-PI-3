@@ -1,13 +1,20 @@
 #!/usr/bin/python3
 
 """
-Detects stronghold goals using a usb camera plugged into raspberry pi
+Sample program that uses a generated GRIP pipeline to detect red areas in an image and publish them to NetworkTables.
 """
 
 import cv2
+import urllib
 import networktables
 from networktables import NetworkTable
-from usb_GRIP import GripPipeline
+from networktables2 import NumberArray
+from boilervisionipcamera import GripPipeline
+import datetime
+from time import sleep
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 
 def extra_processing(pipeline):
@@ -28,6 +35,7 @@ def extra_processing(pipeline):
         center_y_positions.append(y + h / 2)
         widths.append(w)
         heights.append(y)
+    print(center_x_positions)
     # Publish to the '/vision' network table
     table = NetworkTable.getTable("/vision")
     table.putValue("centerX", NumberArray.from_list(center_x_positions))
@@ -36,24 +44,37 @@ def extra_processing(pipeline):
     table.putValue("height", NumberArray.from_list(heights))
 
 
+    
+
+
 def main():
     print('Initializing NetworkTables')
+    NetworkTable.setIPAddress("10.52.55.98")
     NetworkTable.setClientMode()
-    NetworkTable.setIPAddress('localhost')
     NetworkTable.initialize()
 
+
     print('Creating video capture')
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture("http://10.52.55.3/mjpg/video.mjpg")
+    print("here")
+   
+    bytes = ''
+    first = False
+
+
+
 
     print('Creating pipeline')
     pipeline = GripPipeline()
 
     print('Running pipeline')
+
     while cap.isOpened():
         have_frame, frame = cap.read()
         if have_frame:
             pipeline.process(frame)
             extra_processing(pipeline)
+
 
     print('Capture closed')
 
